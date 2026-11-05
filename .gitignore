@@ -1,0 +1,35 @@
+# Rust & Tauri build targets
+target/
+src-tauri/target/
+src-tauri/gen/
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+env/
+venv/
+
+# Kokoro & LLM large weight files (download via INSTRUCTIONS.md)
+*.onnx
+*.bin
+*.gguf
+
+# User Personal Notes & Captures (Keep directory structure)
+notes/note_*
+!notes/note_*welcome.md
+screenshots/*.png
+
+# AppImage Release Binaries (Recommended to publish via GitHub Releases)
+# Uncomment if you prefer not to commit the 82MB binary into git history:
+# *.AppImage
+
+# Node / Tauri CLI temp
+node_modules/
+.npm/
+
+# OS metadata
+.DS_Store
+Thumbs.db

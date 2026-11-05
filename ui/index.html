@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STARK INDUSTRIES // J.A.R.V.I.S. (ESPERANZA EDITION)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: #02060f;
+      color: #dcf8ff;
+      font-family: 'Ubuntu Mono', 'Courier New', Courier, monospace;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 14px 18px;
+      background-image: 
+        radial-gradient(rgba(0, 240, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(2, 6, 15, 0.95), rgba(4, 12, 28, 0.98));
+      background-size: 24px 24px, 100% 100%;
+    }
+
+    /* Scanline effect */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 240, 255, 0.02) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    /* TOP HEADER */
+    .top-header {
+      background: rgba(4, 14, 32, 0.88);
+      border: 1px solid rgba(0, 216, 246, 0.3);
+      border-radius: 4px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.08);
+    }
+
+    .brand-title {
+      color: #00f0ff;
+      font-size: 15px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+    }
+
+    .brand-sub {
+      color: #527e99;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+    }
+
+    .status-pill {
+      background: rgba(0, 240, 255, 0.12);
+      border: 1px solid rgba(0, 240, 255, 0.45);
+      color: #00f0ff;
+      padding: 4px 18px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow: 0 0 6px rgba(0, 240, 255, 0.5);
+    }
+
+    .clock-display {
+      text-align: right;
+    }
+
+    .clock-time {
+      color: #00f0ff;
+      font-size: 19px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+    }
+
+    .clock-date {
+      color: #527e99;
+      font-size: 10px;
+    }
+
+    /* MAIN HUD GRID */
+    .hud-workspace {
+      display: flex;
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+      margin-bottom: 12px;
+    }
+
+    .hud-card {
+      background: rgba(4, 14, 32, 0.85);
+      border: 1px solid rgba(0, 216, 246, 0.3);
+      border-radius: 4px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.05);
+    }
+
+    .card-header {
+      color: #00f0ff;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+    }
+
+    /* LEFT WING */
+    .left-wing {
+      width: 270px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .radar-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 6px;
+    }
+
+    .metric-row {
+      margin-bottom: 8px;
+    }
+
+    .metric-label {
+      color: #dcf8ff;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+
+    .progress-bar-bg {
+      background: rgba(3, 10, 24, 0.8);
+      height: 6px;
+      border-radius: 2px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 216, 246, 0.2);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0066cc, #00f0ff);
+      width: 0%;
+      transition: width 0.4s ease;
+      box-shadow: 0 0 8px #00f0ff;
+    }
+
+    .telemetry-meta {
+      color: #527e99;
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .model-select {
+      background: rgba(2, 8, 20, 0.95);
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      color: #00f0ff;
+      font-family: inherit;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 3px;
+      width: 100%;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* CENTER WING - ARC REACTOR */
+    .center-wing {
+      width: 320px;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    #arcCanvas {
+      width: 280px;
+      height: 280px;
+    }
+
+    .reactor-meta {
+      color: #527e99;
+      font-size: 9px;
+      text-align: center;
+      letter-spacing: 1px;
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+    /* RIGHT WING - TRANSCRIPT */
+    .right-wing {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .transcript-container {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .transcript-container::-webkit-scrollbar {
+      width: 5px;
+    }
+    .transcript-container::-webkit-scrollbar-thumb {
+      background: rgba(0, 240, 255, 0.35);
+      border-radius: 2px;
+    }
+
+    .bubble {
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      line-height: 1.45;
+      user-select: text;
+    }
+
+    .bubble-user {
+      background: rgba(8, 24, 48, 0.9);
+      border: 1px solid rgba(0, 119, 255, 0.5);
+      margin-left: 40px;
+    }
+
+    .bubble-ai {
+      background: rgba(3, 14, 30, 0.9);
+      border: 1px solid rgba(0, 240, 255, 0.45);
+      margin-right: 40px;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.05);
+    }
+
+    .bubble-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    .bubble-user .bubble-header { color: #0088ff; }
+    .bubble-ai .bubble-header { color: #00f0ff; }
+
+    /* ACTION RIBBON */
+    .action-ribbon {
+      background: rgba(3, 10, 24, 0.9);
+      border: 1px solid rgba(0, 216, 246, 0.28);
+      border-radius: 4px;
+      padding: 7px 10px;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tactical-btn {
+      background: rgba(5, 16, 32, 0.85);
+      border: 1px solid rgba(0, 216, 246, 0.3);
+      color: #dcf8ff;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: bold;
+      border-radius: 3px;
+      padding: 6px 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tactical-btn:hover {
+      background: rgba(0, 240, 255, 0.22);
+      border: 1px solid #00f0ff;
+      color: #ffffff;
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+    }
+
+    /* BOTTOM INPUT DOCK */
+    .input-dock {
+      background: rgba(4, 14, 32, 0.95);
+      border: 1px solid #00f0ff;
+      border-radius: 4px;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 0 18px rgba(0, 240, 255, 0.15);
+    }
+
+    .dock-btn {
+      background: rgba(6, 20, 36, 0.9);
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      color: #00f0ff;
+      font-family: inherit;
+      font-weight: bold;
+      font-size: 11px;
+      border-radius: 3px;
+      padding: 8px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .dock-btn:hover {
+      background: rgba(0, 240, 255, 0.2);
+    }
+
+    .dock-btn.active {
+      background: rgba(255, 42, 85, 0.35);
+      border: 1.5px solid #ff2a55;
+      color: #ff2a55;
+      box-shadow: 0 0 10px #ff2a55;
+    }
+
+    .prompt-label {
+      color: #00f0ff;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .input-field {
+      flex: 1;
+      background: rgba(2, 8, 20, 0.95);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      border-radius: 3px;
+      padding: 10px 14px;
+      color: #dcf8ff;
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .input-field:focus {
+      border: 1.5px solid #00f0ff;
+      background: rgba(4, 14, 32, 0.95);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+
+    .send-btn {
+      background: linear-gradient(90deg, #0066cc, #00f0ff);
+      color: #02060f;
+      font-family: inherit;
+      font-weight: bold;
+      font-size: 11px;
+      border: none;
+      border-radius: 3px;
+      padding: 10px 18px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+
+    .send-btn:hover {
+      background: linear-gradient(90deg, #0077ee, #33ffff);
+      box-shadow: 0 0 12px #00f0ff;
+    }
+
+    /* NOTES MODAL OVERLAY */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(2, 6, 15, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      width: 780px;
+      max-width: 90vw;
+      height: 520px;
+      background: rgba(4, 14, 32, 0.98);
+      border: 1.5px solid #00f0ff;
+      border-radius: 6px;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.25);
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      color: #00f0ff;
+      font-weight: bold;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: #ff2a55;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .notes-body {
+      display: flex;
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .notes-list-col {
+      width: 260px;
+      border-right: 1px solid rgba(0, 240, 255, 0.2);
+      padding-right: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .notes-col-title {
+      font-size: 10px;
+      color: #527e99;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .notes-list-box {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .note-card {
+      background: rgba(2, 8, 20, 0.8);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 3px;
+      padding: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .note-card:hover {
+      border-color: #00f0ff;
+      background: rgba(0, 240, 255, 0.1);
+    }
+
+    .note-card.active {
+      border-color: #00f0ff;
+      background: rgba(0, 240, 255, 0.18);
+    }
+
+    .note-card-title {
+      color: #00f0ff;
+      font-size: 11px;
+      font-weight: bold;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .note-card-time {
+      color: #527e99;
+      font-size: 9px;
+      margin-top: 2px;
+    }
+
+    .notes-editor-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .note-input {
+      background: rgba(2, 8, 20, 0.9);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      color: #00f0ff;
+      font-family: inherit;
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 3px;
+      outline: none;
+    }
+
+    .note-textarea {
+      flex: 1;
+      background: rgba(2, 8, 20, 0.9);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      color: #dcf8ff;
+      font-family: inherit;
+      font-size: 12px;
+      line-height: 1.45;
+      padding: 10px;
+      border-radius: 3px;
+      outline: none;
+      resize: none;
+      user-select: text;
+    }
+
+    .note-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. TOP HUD BANNER -->
+  <header class="top-header">
+    <div>
+      <div class="brand-title">STARK INDUSTRIES // PROTOCOL 11</div>
+      <div class="brand-sub">J.A.R.V.I.S. TAURI RUST ARCHITECTURE // ESPERANZA AI</div>
+    </div>
+    <div id="statusPill" class="status-pill">● SYSTEM IDLE // ALL CHANNELS SECURE</div>
+    <div class="clock-display">
+      <div id="clockTime" class="clock-time">00:00:00</div>
+      <div id="clockDate" class="clock-date">LOADING CALENDAR...</div>
+    </div>
+  </header>
+
+  <!-- 2. MAIN HUD WORKSPACE -->
+  <main class="hud-workspace">
+
+    <!-- LEFT WING -->
+    <section class="hud-card left-wing">
+      <div class="card-header">┌─[ TACTICAL TELEMETRY ]</div>
+      
+      <div class="radar-container">
+        <canvas id="miniRadar" width="130" height="130"></canvas>
+      </div>
+
+      <div class="metric-row">
+        <div class="metric-label">
+          <span>CPU (4 THREADS LOCKED)</span>
+          <span id="cpuVal">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="cpuBar" class="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="metric-row">
+        <div class="metric-label">
+          <span>RAM MEMORY</span>
+          <span id="ramVal">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="ramBar" class="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <div id="diskMeta" class="telemetry-meta">STORAGE: -- // NOTES: 0</div>
+      <div id="uptimeMeta" class="telemetry-meta">KERNEL UPTIME: --</div>
+
+      <div class="card-header" style="margin-top: 10px;">┌─[ NEURAL CORE SELECT ]</div>
+      <select id="modelSelect" class="model-select">
+        <option value="llama3.2:3b">llama3.2:3b</option>
+      </select>
+    </section>
+
+    <!-- CENTER WING - ARC REACTOR -->
+    <section class="hud-card center-wing">
+      <div class="card-header">┌─[ ARC REACTOR MARK VI ]</div>
+      <canvas id="arcCanvas" width="280" height="280"></canvas>
+      <div class="reactor-meta">
+        OUTPUT: 3.2 GJ/s // STABLE<br>
+        VIBRANIUM CORE FREQ: 44.1 kHz
+      </div>
+    </section>
+
+    <!-- RIGHT WING - TRANSCRIPT -->
+    <section class="hud-card right-wing">
+      <div class="card-header">┌─[ HOLOGRAPHIC TRANSCRIPT & CO-PILOT LOG ]</div>
+      <div id="transcript" class="transcript-container">
+        <!-- Chat bubbles appended here -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 3. ACTION RIBBON -->
+  <nav class="action-ribbon">
+    <button class="tactical-btn" onclick="openNotesModal()">📝 NOTES (<span id="notesCountBadge">0</span>)</button>
+    <button class="tactical-btn" onclick="execAction('hud_stats')">⚡ HUD STATS</button>
+    <button class="tactical-btn" onclick="execAction('start_kobold')">🚀 KOBOLD VULKAN</button>
+    <button class="tactical-btn" onclick="execAction('screenshot')">📸 SCREENSHOT</button>
+    <button class="tactical-btn" onclick="execAction('weather')">🌦 WEATHER</button>
+    <button class="tactical-btn" onclick="execAction('wiki_prompt')">📖 ARCHIVE WIKI</button>
+    <button class="tactical-btn" onclick="execAction('volume_up')">🔊 VOL +</button>
+    <button class="tactical-btn" onclick="execAction('volume_down')">🔉 VOL -</button>
+    <button class="tactical-btn" onclick="execAction('volume_mute')">🔇 MUTE</button>
+    <button class="tactical-btn" onclick="clearLog()">🧹 PURGE LOG</button>
+  </nav>
+
+  <!-- 4. BOTTOM INPUT DOCK -->
+  <footer class="input-dock">
+    <button id="micBtn" class="dock-btn" onclick="toggleMic()">🎙 RADAR MIC</button>
+    <button id="voiceBtn" class="dock-btn" onclick="toggleVoice()">🔊 VOICE: ON</button>
+    <span class="prompt-label">JACK &gt;</span>
+    <input type="text" id="userInput" class="input-field" placeholder="Command Stark HUD or enter query (Type '/note text' to save note)..." onkeydown="handleKey(event)">
+    <button class="send-btn" onclick="submitMessage()">TRANSMIT ➤</button>
+  </footer>
+
+  <!-- 5. NOTES ARCHIVE MODAL -->
+  <div id="notesModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>┌─[ STARK ARCHIVE // PERSISTENT ./notes/ SUBDIRECTORY ]</span>
+        <button class="modal-close" onclick="closeNotesModal()">✖</button>
+      </div>
+      <div class="notes-body">
+        <div class="notes-list-col">
+          <div class="notes-col-title">ARCHIVED NOTES</div>
+          <div id="notesList" class="notes-list-box">
+            <!-- Notes populated here -->
+          </div>
+        </div>
+        <div class="notes-editor-col">
+          <div class="notes-col-title">NOTE INSPECTOR & COMPOSER</div>
+          <input type="text" id="noteTitleInput" class="note-input" placeholder="Note Title...">
+          <textarea id="noteContentInput" class="note-textarea" placeholder="Note content... (Stored in ./notes/*.md)"></textarea>
+          <div class="note-actions">
+            <button class="tactical-btn" onclick="clearNoteEditor()">➕ NEW</button>
+            <button class="tactical-btn" onclick="saveCurrentNote()">💾 SAVE TO ./notes/</button>
+            <button class="tactical-btn" id="deleteNoteBtn" style="color: #ff2a55; display: none;" onclick="deleteSelectedNote()">🗑 DELETE</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const invoke = window.__TAURI__ ? window.__TAURI__.core.invoke : null;
+    let voiceEnabled = true;
+    let isListening = false;
+    let chatHistory = [];
+    let currentVoice = "af_heart";
+    let cachedNotes = [];
+    let selectedNoteFilename = null;
+
+    // ------------------------------------------------------------------------
+    // Stark Arc Reactor Canvas Animation
+    // ------------------------------------------------------------------------
+    const canvas = document.getElementById("arcCanvas");
+    const ctx = canvas.getContext("2d");
+    let angleOuter = 0;
+    let angleMiddle = 0;
+    let radarAngle = 0;
+    let arcState = "IDLE"; // IDLE, THINKING, SPEAKING, LISTENING
+    const waveBars = new Array(24).fill(0);
+
+    function drawArcReactor() {
+      const cx = 140, cy = 140;
+      const rMax = 126;
+      ctx.clearRect(0, 0, 280, 280);
+
+      // Rotation Speeds
+      let speedMult = 1.0;
+      let accent = "#00f0ff";
+      if (arcState === "THINKING") { speedMult = 3.2; accent = "#ffb000"; }
+      else if (arcState === "SPEAKING") { speedMult = 2.0; accent = "#00ff9d"; }
+      else if (arcState === "LISTENING") { speedMult = 1.6; accent = "#ff2a55"; }
+
+      angleOuter += 0.012 * speedMult;
+      angleMiddle -= 0.018 * speedMult;
+      radarAngle += 0.035 * speedMult;
+
+      const pulse = Math.sin(performance.now() * 0.003) * 0.5 + 0.5;
+
+      // 1. Dark Housing Well
+      const bgGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, rMax);
+      bgGrad.addColorStop(0, "rgba(2, 6, 16, 0.95)");
+      bgGrad.addColorStop(0.85, "rgba(4, 16, 36, 0.75)");
+      bgGrad.addColorStop(1, "rgba(0, 216, 246, 0.15)");
+      ctx.fillStyle = bgGrad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, rMax, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. Outermost Retaining Ring
+      ctx.strokeStyle = "rgba(0, 216, 246, 0.35)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, rMax - 1, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // 3. Segmented Caliper Ring
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angleOuter);
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 1.8;
+      ctx.setLineDash([16, 8, 4, 8]);
+      ctx.beginPath();
+      ctx.arc(0, 0, rMax - 12, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
+      // 4. Middle Arc Reactor Coils (10 Glowing Induction Blocks)
+      const rCoils = rMax - 26;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angleMiddle);
+      const coilCount = 10;
+      for (let i = 0; i < coilCount; i++) {
+        ctx.save();
+        ctx.rotate((i * Math.PI * 2) / coilCount);
+        ctx.fillStyle = accent;
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 1;
+        ctx.fillRect(-6, -rCoils, 12, 10);
+        ctx.strokeRect(-6, -rCoils, 12, 10);
+        ctx.restore();
+      }
+      ctx.restore();
+
+      // 5. Inner Dash Ring & Radar Sweep
+      const rInner = rMax * 0.52;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.strokeStyle = "rgba(0, 119, 255, 0.6)";
+      ctx.lineWidth = 1.4;
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.arc(0, 0, rInner, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Radar Sweep
+      ctx.rotate(radarAngle);
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, -rInner);
+      ctx.stroke();
+      ctx.restore();
+
+      // 6. Reactive Audio Wave Bars
+      if (arcState === "SPEAKING" || arcState === "LISTENING") {
+        ctx.save();
+        ctx.translate(cx, cy);
+        const t = performance.now() * 0.008;
+        for (let i = 0; i < waveBars.length; i++) {
+          const val = Math.abs(Math.sin(t + i * 0.4));
+          const barLen = 4 + val * 16;
+          ctx.save();
+          ctx.rotate((i * Math.PI * 2) / waveBars.length);
+          ctx.strokeStyle = accent;
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.moveTo(0, -rInner + 2);
+          ctx.lineTo(0, -rInner - barLen);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+
+      // 7. Centerpiece: Stark Inverted Vibranium Triangle Core
+      const triSize = rInner * 0.72 + pulse * 3;
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      const coreGrad = ctx.createRadialGradient(0, 0, 5, 0, 0, triSize);
+      coreGrad.addColorStop(0, "#ffffff");
+      coreGrad.addColorStop(0.4, accent);
+      coreGrad.addColorStop(0.85, "#0066cc");
+      coreGrad.addColorStop(1, "transparent");
+
+      ctx.fillStyle = coreGrad;
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1.6;
+
+      const hTri = (triSize * Math.sqrt(3)) / 2;
+      ctx.beginPath();
+      ctx.moveTo(0, hTri * 0.6);
+      ctx.lineTo(-triSize * 0.6, -hTri * 0.45);
+      ctx.lineTo(triSize * 0.6, -hTri * 0.45);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Inner Iris Orb
+      ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+      ctx.beginPath();
+      ctx.arc(0, -hTri * 0.05, triSize * 0.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      requestAnimationFrame(drawArcReactor);
+    }
+    requestAnimationFrame(drawArcReactor);
+
+    // ------------------------------------------------------------------------
+    // Mini Radar Canvas Animation
+    // ------------------------------------------------------------------------
+    const miniRadar = document.getElementById("miniRadar");
+    const mctx = miniRadar.getContext("2d");
+    let miniRadarAngle = 0;
+
+    function drawMiniRadar() {
+      const cx = 65, cy = 65, r = 58;
+      mctx.clearRect(0, 0, 130, 130);
+
+      // Radar rings
+      mctx.strokeStyle = "rgba(0, 216, 246, 0.35)";
+      mctx.lineWidth = 1.2;
+      mctx.fillStyle = "rgba(4, 14, 28, 0.85)";
+      mctx.beginPath();
+      mctx.arc(cx, cy, r, 0, Math.PI * 2);
+      mctx.fill();
+      mctx.stroke();
+
+      mctx.beginPath();
+      mctx.arc(cx, cy, r * 0.66, 0, Math.PI * 2);
+      mctx.stroke();
+
+      mctx.beginPath();
+      mctx.arc(cx, cy, r * 0.33, 0, Math.PI * 2);
+      mctx.stroke();
+
+      // Crosshairs
+      mctx.strokeStyle = "rgba(0, 216, 246, 0.2)";
+      mctx.beginPath();
+      mctx.moveTo(cx - r, cy); mctx.lineTo(cx + r, cy);
+      mctx.moveTo(cx, cy - r); mctx.lineTo(cx, cy + r);
+      mctx.stroke();
+
+      // Sweep
+      miniRadarAngle = (miniRadarAngle + 0.05) % (Math.PI * 2);
+      mctx.save();
+      mctx.translate(cx, cy);
+      mctx.rotate(miniRadarAngle);
+      mctx.strokeStyle = "#00f0ff";
+      mctx.lineWidth = 1.5;
+      mctx.beginPath();
+      mctx.moveTo(0, 0); mctx.lineTo(0, -r);
+      mctx.stroke();
+      mctx.restore();
+
+      // Blip
+      mctx.fillStyle = "#00ff9d";
+      mctx.beginPath();
+      mctx.arc(cx + 22, cy - 20, 2.5, 0, Math.PI * 2);
+      mctx.fill();
+
+      requestAnimationFrame(drawMiniRadar);
+    }
+    requestAnimationFrame(drawMiniRadar);
+
+    // ------------------------------------------------------------------------
+    // UI Helpers & Messaging
+    // ------------------------------------------------------------------------
+    function appendMessage(sender, text, isUser = false) {
+      const t = document.getElementById("transcript");
+      const bubble = document.createElement("div");
+      bubble.className = "bubble " + (isUser ? "bubble-user" : "bubble-ai");
+
+      const timeStr = new Date().toTimeString().split(" ")[0];
+      bubble.innerHTML = `
+        <div class="bubble-header">
+          <span>┌─[ ${sender.toUpperCase()} ]</span>
+          <span>${timeStr} ─┐</span>
+        </div>
+        <div class="bubble-content">${escapeHtml(text)}</div>
+      `;
+
+      t.appendChild(bubble);
+      t.scrollTop = t.scrollHeight;
+      return bubble;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+    }
+
+    function setSystemStatus(text, state = "IDLE") {
+      document.getElementById("statusPill").innerText = "● " + text.toUpperCase();
+      arcState = state;
+    }
+
+    // Portable Web Speech Fallback for GitHub users without local Kokoro files
+    function speakWebSpeechFallback(text) {
+      if (!('speechSynthesis' in window)) return;
+      try {
+        window.speechSynthesis.cancel();
+        const clean = text.replace(/[*#`_]/g, "").replace(/\n/g, " ");
+        const sentences = clean.split('.').filter(s => s.trim().length > 0);
+        const spoken = sentences.slice(0, 2).join(". ") + ".";
+        const utterance = new SpeechSynthesisUtterance(spoken);
+        utterance.rate = 1.05;
+        utterance.pitch = 1.0;
+        const voices = window.speechSynthesis.getVoices();
+        const match = voices.find(v => v.lang.startsWith("en") && (v.name.includes("Natural") || v.name.includes("Female") || v.name.includes("Google") || v.name.includes("English")));
+        if (match) utterance.voice = match;
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {
+        console.warn("SpeechSynthesis error:", e);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // Tauri Backend Operations
+    // ------------------------------------------------------------------------
+    async function refreshTelemetry() {
+      if (!invoke) return;
+      try {
+        const d = await invoke("get_telemetry");
+        document.getElementById("clockTime").innerText = d.clock;
+        document.getElementById("clockDate").innerText = d.date;
+
+        document.getElementById("cpuVal").innerText = Math.round(d.cpu_usage) + "%";
+        document.getElementById("cpuBar").style.width = Math.min(100, d.cpu_usage) + "%";
+
+        document.getElementById("ramVal").innerText = Math.round(d.ram_percent) + "% (" + d.ram_used_gb + "/" + d.ram_total_gb + "G)";
+        document.getElementById("ramBar").style.width = Math.min(100, d.ram_percent) + "%";
+
+        const secStatus = d.secondary_storage_mounted ? "MOUNT: ON" : "MOUNT: OFF";
+        document.getElementById("diskMeta").innerText = `ROOT SSD: ${d.root_disk_percent}% // ${secStatus} // NOTES: ${d.notes_count}`;
+        document.getElementById("uptimeMeta").innerText = `KERNEL UPTIME: ${d.uptime_hours} HOURS`;
+        document.getElementById("notesCountBadge").innerText = d.notes_count;
+      } catch (err) {
+        console.warn("Telemetry fetch error:", err);
+      }
+    }
+
+    async function populateModels() {
+      if (!invoke) return;
+      try {
+        const models = await invoke("get_models");
+        const sel = document.getElementById("modelSelect");
+        sel.innerHTML = "";
+        models.forEach(m => {
+          const opt = document.createElement("option");
+          opt.value = m;
+          opt.innerText = m;
+          sel.appendChild(opt);
+        });
+        if (models.some(m => m.includes("Kobold"))) {
+          sel.value = models.find(m => m.includes("Kobold"));
+        } else if (models.includes("esperanza:latest")) {
+          sel.value = "esperanza:latest";
+        }
+      } catch (err) {
+        console.warn("Model fetch error:", err);
+      }
+    }
+
+    async function submitMessage() {
+      const input = document.getElementById("userInput");
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+
+      appendMessage("Jack", text, true);
+
+      // Check quick note command: /note <content> or note: <content>
+      if (text.startsWith("/note ") || text.toLowerCase().startsWith("note: ") || text.toLowerCase().startsWith("take note ")) {
+        const noteBody = text.replace(/^\/note\s+/i, "").replace(/^note:\s+/i, "").replace(/^take note\s+/i, "").trim();
+        await quickSaveNote(noteBody);
+        return;
+      }
+
+      // Check quick actions
+      const q = text.toLowerCase();
+      if (q.includes("screenshot")) { execAction("screenshot"); return; }
+      if (q.includes("weather")) { execAction("weather"); return; }
+      if (q.includes("system stats") || q.includes("hud stats")) { execAction("hud_stats"); return; }
+      if (q.startsWith("wikipedia ")) {
+        execAction("wikipedia: " + q.replace("wikipedia", "").trim());
+        return;
+      }
+
+      setSystemStatus("THINKING // NEURAL COMPUTE (4 THREADS)", "THINKING");
+
+      const selectedModel = document.getElementById("modelSelect").value;
+      try {
+        const reply = await invoke("query_llm", {
+          model: selectedModel,
+          prompt: text,
+          history: chatHistory
+        });
+
+        setSystemStatus("SYSTEM IDLE // READY", "IDLE");
+        appendMessage("Esperanza", reply, false);
+
+        chatHistory.push({ role: "user", content: text });
+        chatHistory.push({ role: "assistant", content: reply });
+
+        if (voiceEnabled && reply) {
+          setSystemStatus("VOCALIZING // NEURAL AUDIO", "SPEAKING");
+          invoke("speak_text", { text: reply, voice: currentVoice })
+            .then(() => {
+              setTimeout(() => setSystemStatus("SYSTEM IDLE // READY", "IDLE"), 4000);
+            })
+            .catch(() => {
+              // Fallback to Web Speech API so voice works everywhere!
+              speakWebSpeechFallback(reply);
+              setTimeout(() => setSystemStatus("SYSTEM IDLE // READY", "IDLE"), 3500);
+            });
+        }
+      } catch (err) {
+        setSystemStatus("CORE ERROR", "IDLE");
+        appendMessage("Esperanza", "[Neural Connection Error: " + err + "]\nEnsure local Ollama (127.0.0.1:11434) or KoboldCpp (127.0.0.1:5001) is running.", false);
+      }
+    }
+
+    function handleKey(e) {
+      if (e.key === "Enter") submitMessage();
+    }
+
+    async function execAction(action) {
+      if (action === "hud_stats") {
+        if (!invoke) return;
+        const d = await invoke("get_telemetry");
+        const msg = `⚡ STARK HUD TELEMETRY REPORT ⚡\n• CPU: ${d.cpu_usage}% (4 Threads Hard Locked)\n• RAM: ${d.ram_percent}% (${d.ram_used_gb}/${d.ram_total_gb} GB)\n• Uptime: ${d.uptime_hours} Hours\n• Notes Saved: ${d.notes_count} items in ./notes/`;
+        appendMessage("Esperanza", msg, false);
+        return;
+      }
+
+      if (action === "wiki_prompt") {
+        appendMessage("Esperanza", "Type 'wikipedia [topic]' into the prompt line to query global archives.", false);
+        return;
+      }
+
+      setSystemStatus("EXECUTING // " + action.toUpperCase(), "THINKING");
+      try {
+        const res = await invoke("execute_action", { action });
+        appendMessage("Esperanza", res, false);
+        setSystemStatus("SYSTEM IDLE // READY", "IDLE");
+      } catch (err) {
+        setSystemStatus("ACTION FAILED", "IDLE");
+        appendMessage("Esperanza", "Action error: " + err, false);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // NOTES SUBSYSTEM IMPLEMENTATION
+    // ------------------------------------------------------------------------
+    async function openNotesModal() {
+      document.getElementById("notesModal").style.display = "flex";
+      await reloadNotesList();
+    }
+
+    function closeNotesModal() {
+      document.getElementById("notesModal").style.display = "none";
+    }
+
+    async function reloadNotesList() {
+      if (!invoke) return;
+      try {
+        cachedNotes = await invoke("list_notes");
+        document.getElementById("notesCountBadge").innerText = cachedNotes.length;
+        const box = document.getElementById("notesList");
+        box.innerHTML = "";
+
+        if (cachedNotes.length === 0) {
+          box.innerHTML = `<div style="color: #527e99; font-size: 11px; padding: 10px;">No notes yet in ./notes/</div>`;
+          clearNoteEditor();
+          return;
+        }
+
+        cachedNotes.forEach((note, idx) => {
+          const card = document.createElement("div");
+          card.className = "note-card" + (selectedNoteFilename === note.filename ? " active" : "");
+          card.innerHTML = `
+            <div class="note-card-title">${escapeHtml(note.title)}</div>
+            <div class="note-card-time">${escapeHtml(note.timestamp)}</div>
+          `;
+          card.onclick = () => selectNote(note);
+          box.appendChild(card);
+        });
+
+        if (selectedNoteFilename) {
+          const found = cachedNotes.find(n => n.filename === selectedNoteFilename);
+          if (found) selectNote(found);
+        } else if (cachedNotes.length > 0) {
+          selectNote(cachedNotes[0]);
+        }
+      } catch (err) {
+        console.warn("Error reloading notes:", err);
+      }
+    }
+
+    function selectNote(note) {
+      selectedNoteFilename = note.filename;
+      document.getElementById("noteTitleInput").value = note.title;
+      document.getElementById("noteContentInput").value = note.content;
+      document.getElementById("deleteNoteBtn").style.display = "inline-block";
+
+      // Highlight active in list
+      const cards = document.querySelectorAll(".note-card");
+      cards.forEach((c, i) => {
+        if (cachedNotes[i] && cachedNotes[i].filename === note.filename) {
+          c.classList.add("active");
+        } else {
+          c.classList.remove("active");
+        }
+      });
+    }
+
+    function clearNoteEditor() {
+      selectedNoteFilename = null;
+      document.getElementById("noteTitleInput").value = "";
+      document.getElementById("noteContentInput").value = "";
+      document.getElementById("deleteNoteBtn").style.display = "none";
+      const cards = document.querySelectorAll(".note-card");
+      cards.forEach(c => c.classList.remove("active"));
+    }
+
+    async function saveCurrentNote() {
+      if (!invoke) return;
+      const title = document.getElementById("noteTitleInput").value.trim();
+      const content = document.getElementById("noteContentInput").value.trim();
+      if (!content) {
+        alert("Please enter note content.");
+        return;
+      }
+
+      try {
+        const item = await invoke("save_note", { title, content });
+        selectedNoteFilename = item.filename;
+        await reloadNotesList();
+        appendMessage("Esperanza", `📝 Note archived to ./notes/${item.filename}`, false);
+      } catch (err) {
+        alert("Failed to save note: " + err);
+      }
+    }
+
+    async function quickSaveNote(text) {
+      if (!invoke) return;
+      const title = text.length > 30 ? text.substring(0, 30) + "..." : text;
+      try {
+        const item = await invoke("save_note", { title, content: text });
+        appendMessage("Esperanza", `📝 Fast Note saved to ./notes/${item.filename}`, false);
+        refreshTelemetry();
+      } catch (err) {
+        appendMessage("Esperanza", `Failed to save note: ${err}`, false);
+      }
+    }
+
+    async function deleteSelectedNote() {
+      if (!selectedNoteFilename || !invoke) return;
+      if (!confirm(`Delete note ${selectedNoteFilename}?`)) return;
+
+      try {
+        await invoke("delete_note", { filename: selectedNoteFilename });
+        selectedNoteFilename = null;
+        clearNoteEditor();
+        await reloadNotesList();
+        refreshTelemetry();
+      } catch (err) {
+        alert("Failed to delete note: " + err);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // Voice & Mic Controls
+    // ------------------------------------------------------------------------
+    async function toggleMic() {
+      const btn = document.getElementById("micBtn");
+      isListening = !isListening;
+      if (isListening) {
+        btn.classList.add("active");
+        setSystemStatus("RADAR MIC // LISTENING", "LISTENING");
+        try {
+          const transcribed = await invoke("trigger_mic");
+          btn.classList.remove("active");
+          setSystemStatus("SYSTEM IDLE // READY", "IDLE");
+          if (transcribed) {
+            document.getElementById("userInput").value = transcribed;
+            submitMessage();
+          }
+        } catch (err) {
+          btn.classList.remove("active");
+          setSystemStatus("SYSTEM IDLE // READY", "IDLE");
+          appendMessage("Esperanza", "Mic error: " + err, false);
+        }
+      } else {
+        btn.classList.remove("active");
+        setSystemStatus("SYSTEM IDLE // READY", "IDLE");
+      }
+    }
+
+    function toggleVoice() {
+      voiceEnabled = !voiceEnabled;
+      const btn = document.getElementById("voiceBtn");
+      btn.innerText = voiceEnabled ? "🔊 VOICE: ON" : "🔇 VOICE: OFF";
+      btn.style.color = voiceEnabled ? "#00f0ff" : "#527e99";
+    }
+
+    function clearLog() {
+      chatHistory = [];
+      document.getElementById("transcript").innerHTML = "";
+      appendMessage("Esperanza", "Context memory purged. All systems calibrated.", false);
+    }
+
+    // Initialize
+    window.addEventListener("DOMContentLoaded", () => {
+      refreshTelemetry();
+      populateModels();
+      setInterval(refreshTelemetry, 1000);
+
+      setTimeout(() => {
+        const welcome = "Stark Industries Mark III HUD online. Welcome back, Jack. All channels active and locked to 4 threads.";
+        appendMessage("Esperanza", welcome, false);
+        if (invoke) {
+          invoke("speak_text", { text: welcome, voice: currentVoice })
+            .catch(() => speakWebSpeechFallback(welcome));
+        }
+      }, 700);
+    });
+  </script>
+</body>
+</html>
